@@ -44,7 +44,7 @@ public class Broadcast {
     public static ArrayList<String[]> lignesToTab(ArrayList<String> inLine) {
         ArrayList<String[]> framesEnTab = new ArrayList<>();
         for (int i = 0; i < inLine.size(); i++) {
-            framesEnTab.add(ligneToTab(inLine.get(i)));
+            framesEnTab.add(lineToArray(inLine.get(i)));
         }
         return framesEnTab;
     }
@@ -55,23 +55,18 @@ public class Broadcast {
      * @param line the line to split
      * @return the splitted line into an array
      */
-    public static String[] ligneToTab(String line) {
+    public static String[] lineToArray(String line) {
 
-        /* Le tableau de sorti est organisé de cette manière
+        /* The output frame is organized like this (Broadcast channel)
          * 
          * Indice   | Contenu
-         * 0		| Frame Number (fn)
+         * 0        | Frame Number (fn)
          * 1        | "0:"
          * 2-24     | data
          */
         String[] splitArray;
         splitArray = line.split(" ");
 
-        /* --------- TEST AFFICHAGE DU TABLEAU -----------
-         for(int i = 0; i< splitArray.length;i++){
-         // On affiche chaque élément du tableau
-         System.out.println("élement n° " + i + "=[" + splitArray[i]+"]");
-         }*/
         return splitArray;
     }
 
@@ -110,12 +105,13 @@ public class Broadcast {
      * @return true if the passed frame is an IA, false otherwise
      */
     public static boolean isImmediateAssignment(String[] frame) {
-
+        // we check hexa data (0x063f) at this specific location mean it's an IA
+        // you can check this with wireshark
         return frame.length > 4 && frame[3].equals("06") && frame[4].equals("3f");
     }
 
     /**
-     * Looking for "Immediate Assignment"
+     * Looking for "Immediate Assignment" 
      *
      * @param frames all splitted frames into an arraylist
      * @return an array of immediate assignment
@@ -124,7 +120,7 @@ public class Broadcast {
         ArrayList<Integer> immediateAssignment = new ArrayList<>();
 
         for (int i = 0; i < frames.size(); i++) {
-            // we check the i th frame
+            // we check the currnet frame is an Immedate Assignment
             if (isImmediateAssignment(frames.get(i))) {
                 immediateAssignment.add(i);
             }
