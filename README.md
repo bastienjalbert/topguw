@@ -1,4 +1,8 @@
 # Topguw
+
+I had to change the repository because of some local problem.. I'm sorry for those who forked and/or star my project. This will be the last for Topguw.
+Sorry again for the inconvenience.
+
 ### About
 Topguw is a little software that I made to help people who want to analyse and then crack GSM. 
 Topguw works with airprobe and kalibrate-rtl. 
