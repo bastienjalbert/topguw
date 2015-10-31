@@ -52,7 +52,7 @@ public class Dedicated extends Principal {
 
         ArrayList<String[]> framesEnTab = new ArrayList<>();
         for (int i = 0; i < inLine.size(); i++) {
-            framesEnTab.add(ligneToTab(inLine.get(i)));
+            framesEnTab.add(lineToArray(inLine.get(i)));
         }
         return framesEnTab;
     }
@@ -63,19 +63,19 @@ public class Dedicated extends Principal {
      * @param line the line to split
      * @return the splitted line into an array
      */
-    public static String[] ligneToTab(String line) {
+    public static String[] lineToArray(String line) {
 
         /* Array are like this (with dedicated channel [ S config with airprobe])
          * 
          * Index    | Contents
-         * 0		| Burst Type (i.e "C1", "P0", "S0", ...)
+         * 0	    | Burst Type (i.e "C1", "P0", "S0", ...)
          * 1        | fn 
          * 2        | fn (a5/1) + ":"
          * 3        | data (one burst)
          */
         /*
          * Index    | Contents
-         * 0		| fn
+         * 0        | fn
          * 1        | number + ":" 
          * 2-25     | hex frame 
          */
@@ -166,7 +166,7 @@ public class Dedicated extends Principal {
     }
 
     /**
-     * Search for Ciphering Mode Command
+     * Search for Ciphering Mode Command (0x0635)
      *
      * @param inArray frames in an array
      * @return
@@ -176,7 +176,7 @@ public class Dedicated extends Principal {
 
         for (int i = 0; i < inArray.size(); i++) {
             if (inArray.get(i).length == 25) {
-  
+                
                 if (inArray.get(i)[5].equals("06")
                         && inArray.get(i)[6].equals("35")) {
                     String[] temp = new String[2];
@@ -213,6 +213,7 @@ public class Dedicated extends Principal {
         ArrayList<String[]> cipheredSi = new ArrayList<>();
 
         if (systemInfo == null || cipherModCommand == null) {
+            // TODO : greyed button (making not clickable) before the two  steps before are not made
             throw new Exception(START_LINE + "Error : you have to find SI cleartext and Ciphering Mode Command position before.\n");
         } else {
             for (int i = 0; i < systemInfo.size(); i++) {
@@ -223,6 +224,7 @@ public class Dedicated extends Principal {
                             // current frame is not an unecrypted SI 5
                             && Integer.parseInt(dedicatedChannelTab.get(j)[1]) != Integer.parseInt(systemInfo.get(i)[0])
                             // if frames(unencrypted and possible encrypted) are in the same place in the multi frame
+                            // HERE IT'S ONE OF THE MOST IMPORTANT CHECK TO FOUND POSSIBLE ENCRYPTED SI (and so KEYSTREAMs)
                             && ((Integer.parseInt(dedicatedChannelTab.get(j)[1]) - Integer.parseInt(systemInfo.get(i)[0])) % 204  == 0)) {
                         
                         for (int a = 0; a < cipherModCommand.size(); a++) {
@@ -230,13 +232,14 @@ public class Dedicated extends Principal {
                             if(localDedicatedChannelFn != Integer.parseInt(dedicatedChannelTab.get(j)[1])
                                     // the frame is encrypted 
                                     && isParityErr(dedicatedChannelTab.get(j)[1])) {
-                                System.out.println("one found");
+                                
+                                System.out.println("one found possible encrypted SI found"); // debugging
                                 String[] temp = new String[4];
                                 /*
                                  * ind 0 : SI plaintext Frame Number
-                                 * ind 1 : SI plaintext Frame Number % 102
+                                 * ind 1 : SI plaintext Frame Number % 102 (location in the multi-frame)
                                  * ind 2 : SI Ciphered possible position
-                                 * ind 3 : SI Ciphered possible position % 102 -
+                                 * ind 3 : SI Ciphered possible position % 102-(location in the multi-frame)
                                  */
 
                                 localDedicatedChannelFn = Integer.parseInt(dedicatedChannelTab.get(j)[1]);
@@ -258,7 +261,7 @@ public class Dedicated extends Principal {
     /**
      * Check if a frame number is link to an encrypted SI frame (after founding
      * them)
-     *
+     * unused ..
      * @param fn the frame number
      * @param fn2 the second frame number
      * @return true if the frame number is link, false if not
@@ -281,6 +284,7 @@ public class Dedicated extends Principal {
     public static boolean isParityErr(String fn) {
 
         // read dedicated channel (xS) line by line
+        // TODO : increase performance by running the test with already loaded file
         ArrayList<String> temp = General.readFile(file.getAbsolutePath() + "_" + timeslot + "S");
 
         // and check if e found a parity error linked to the fn

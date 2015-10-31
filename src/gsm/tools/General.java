@@ -191,19 +191,17 @@ public class General extends Principal {
         try {
             InputStream ips = new FileInputStream(file);
             InputStreamReader ipsr = new InputStreamReader(ips);
-            BufferedReader br = new BufferedReader(ipsr);
-            String ligne = br.readLine();
-            @SuppressWarnings("unused")
-            int i = 0;
-            while (ligne != null) {
-                fichier.add(ligne.toString());
-                i++;
-                ligne = br.readLine();
+            try (BufferedReader br = new BufferedReader(ipsr)) {
+                String ligne = br.readLine();
+                int i = 0;
+                while (ligne != null) {
+                    fichier.add(ligne.toString());
+                    i++;
+                    ligne = br.readLine();
+                }
             }
-            br.close();
         } catch (Exception e) {
-            // user has to give this output if he gets problem from I/O
-            System.out.println(e.toString() + e);
+            System.out.println("Error : " + e.toString() + e);
         }
         return fichier;
     }
@@ -220,18 +218,17 @@ public class General extends Principal {
         try {
             InputStream ips = new FileInputStream(file);
             InputStreamReader ipsr = new InputStreamReader(ips);
-            BufferedReader br = new BufferedReader(ipsr);
-            String ligne = br.readLine();
-            @SuppressWarnings("unused")
-            int i = 0;
-            while (ligne != null) {
-                fichier.add(ligne.toString());
-                ligne = br.readLine();
+            try (BufferedReader br = new BufferedReader(ipsr)) {
+                String ligne = br.readLine();
+                @SuppressWarnings("unused")
+                        int i = 0;
+                while (ligne != null) {
+                    fichier.add(ligne.toString());
+                    ligne = br.readLine();
+                }
             }
-            br.close();
         } catch (Exception e) {
-            // user has to give this output if he gets problem from I/O
-            System.out.println(e.toString() + e);
+            System.out.println("Error : " + e.toString() + e);
         }
         return fichier;
     }
@@ -247,14 +244,14 @@ public class General extends Principal {
         try {
             FileWriter fw = new FileWriter(fileName);
             BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter outputFile = new PrintWriter(bw);
-            for (int i = 0; i < array.size(); i++) {
-                outputFile.println(array.get(i));
+            try (PrintWriter outputFile = new PrintWriter(bw)) {
+                for (int i = 0; i < array.size(); i++) {
+                    outputFile.println(array.get(i));
+                }
             }
-            outputFile.close();
         } catch (Exception e) {
             // user has to give this output if he gets problem from I/O
-            System.out.println(e.toString());
+            System.out.println("Error : " + e.toString() + e);
         }
     }
 
@@ -271,32 +268,32 @@ public class General extends Principal {
         try {
             FileWriter fw = new FileWriter(fileName);
             BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter outputFile = new PrintWriter(bw);
-            if (param == 1) {
-                for (int i = 0; i < array.size(); i++) {
-                    for (int j = 0; j < array.get(i).length; j++) {
-                        if (j == array.get(i).length - 1) {
-                            outputFile.println(array.get(i)[j]);
-                        } else {
-                            outputFile.print(array.get(i)[j] + " : ");
+            try (PrintWriter outputFile = new PrintWriter(bw)) {
+                if (param == 1) {
+                    for (int i = 0; i < array.size(); i++) {
+                        for (int j = 0; j < array.get(i).length; j++) {
+                            if (j == array.get(i).length - 1) {
+                                outputFile.println(array.get(i)[j]);
+                            } else {
+                                outputFile.print(array.get(i)[j] + " : ");
+                            }
                         }
                     }
-                }
-            } else if (param == 2) {
-                for (int i = 0; i < array.size(); i++) {
-                    for (int j = 0; j < array.get(i).length; j++) {
-                        // don't write empty or null value
-                        if(!(array.get(i)[j] == null || array.get(i)[j].equals(""))) 
+                } else if (param == 2) {
+                    for (int i = 0; i < array.size(); i++) {
+                        for (int j = 0; j < array.get(i).length; j++) {
+                            // don't write empty or null value
+                            if(!(array.get(i)[j] == null || array.get(i)[j].equals(""))) 
                                 outputFile.println(array.get(i)[j]);
+                        }
+                        // separator for one array 
+                        outputFile.println("-------------------");
                     }
-                    outputFile.println("-------------------");
                 }
             }
-
-            outputFile.close();
         } catch (Exception e) {
             // user has to give this output if he gets problem from I/O
-            System.out.println(e.toString());
+            System.out.println("Error : " + e.toString() + e);
         }
     }
 
