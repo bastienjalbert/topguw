@@ -13,7 +13,7 @@ V0.1
 
 ## How to install
 1. Dependencies 
-  -  Firstly you have to install airprobe and gsmframecoder (airprobe depends on gnu-radio **3.6**, so if you use Kali 2 for example you have 2 solution -> downgrade to kali 1 or use the zmiana).
+  -  Firstly you have to install airprobe and gsmframecoder (airprobe depends on gnu-radio **3.6**, so if you use Kali 2 for example you have 2 solution -> downgrade to kali 1 or use the zmiana patch).
   -  You should install kalibrate-rtl too (Topguw uses kal command to scan GSM tower).
   -  Not really a dependencies, just to tell you that I use Oracle JDK 1.8 to run Topguw.
 
