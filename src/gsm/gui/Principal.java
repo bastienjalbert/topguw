@@ -501,8 +501,8 @@ public class Principal extends JPanel {
                             if (dialogResult == JOptionPane.YES_OPTION) {
                                 General.getAirprobeOutput(file);
                             } else {
-                                broadcastChannelTab = Broadcast.lignesToTab(General.readFile(file.getAbsolutePath() + "_" + Configuration.BTSCONF));
-                                dedicatedChannelTab = Dedicated.lignesToTab(General.readFile(file.getAbsolutePath() + "_" + timeslot + "S"));
+                                broadcastChannelTab = Broadcast.linesToArray(General.readFile(file.getAbsolutePath() + "_" + Configuration.BTSCONF));
+                                dedicatedChannelTab = Dedicated.linesToArray(General.readFile(file.getAbsolutePath() + "_" + timeslot + "S"));
 
                             }
                         } else {
@@ -521,7 +521,7 @@ public class Principal extends JPanel {
                         localCmd.append(START_LINE + "Making dirty cleaner, please wait...\n");
                         localCmd.update(localCmd.getGraphics());
                         ArrayList<String> dedicatedTemp = General.cleanAirprobeOutput(General.readFile(file.getAbsolutePath() + "_" + timeslot + "S"));
-                        dedicatedChannelTab = Dedicated.lignesToTab(dedicatedTemp);
+                        dedicatedChannelTab = Dedicated.linesToArray(dedicatedTemp);
                         General.writeFile(dedicatedTemp, file.getAbsolutePath() + "_" + timeslot + "S_Topguw-corrected");
 
                     } else {

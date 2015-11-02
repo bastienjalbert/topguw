@@ -48,7 +48,7 @@ public class Dedicated extends Principal {
      * @param inLine
      * @return splitted line into an ArrayList
      */
-    public static ArrayList<String[]> lignesToTab(ArrayList<String> inLine) {
+    public static ArrayList<String[]> linesToArray(ArrayList<String> inLine) {
 
         ArrayList<String[]> framesEnTab = new ArrayList<>();
         for (int i = 0; i < inLine.size(); i++) {
