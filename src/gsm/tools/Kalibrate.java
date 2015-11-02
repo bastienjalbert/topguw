@@ -47,7 +47,7 @@ public class Kalibrate {
      * group 3 freq type (- or +) group 4 freq correction group 5 power
      */
     public static Pattern RGX_KAL
-            = Pattern.compile(".*chan: [0-9]* \\(([0-9]*.[0-9]*)MHz (-+) ([0-9]*.[0-9]*)kHz\\)	power: ([0-9]*.[0-9]*)");
+            = Pattern.compile(".*chan: ([0-9])* \\(([0-9]*.[0-9]*)MHz (-+) ([0-9]*.[0-9]*)kHz\\)	power: ([0-9]*.[0-9]*)");
 
     /**
      * Start kalibrate-rtl (kal) to get GSM tower
@@ -59,7 +59,7 @@ public class Kalibrate {
      * @throws Exception if RTL-SDR device is not plugged
      */
     public static ArrayList<String[]> getGsmCell(String whichGsm, String gain) throws Exception {
-        ArrayList<String[]> gsmCells = new ArrayList<String[]>();
+        ArrayList<String[]> gsmCells = new ArrayList<>();
 
         ProcessBuilder pb = new ProcessBuilder("kal", "-s", whichGsm, "-g", gain);
         pb.redirectErrorStream(true);
@@ -69,27 +69,26 @@ public class Kalibrate {
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String ligne = new String();
         while ((ligne = reader.readLine()) != null) {
-            System.out.println("debug : " + ligne); // TODO : delete (DEBUG LINE)
+            System.out.println("debug : " + ligne); // debug
             if (ligne.equals("No supported devices found.")) {
                 throw new Exception("Please plug-in your RTL-SDR device (not detected).");
             }
             Matcher m = RGX_KAL.matcher(ligne);
             if (m.matches()) {
                 // add the correct frequency					
-                String[] temp = new String[2];
+                String[] temp = new String[3];
                 BigDecimal add = null;
-                if (m.group(2).equals("+")) {
-                    // TODO : capture with a long (parsing)
-                    add = new BigDecimal(Double.parseDouble(m.group(3)));
+                if (m.group(3).equals("+")) {
+                    add = new BigDecimal(Double.parseDouble(m.group(4)));
                 } else {
-                    add = new BigDecimal(-(Double.parseDouble(m.group(3))));
+                    add = new BigDecimal(-(Double.parseDouble(m.group(4))));
                 }
-                BigDecimal big = new BigDecimal(Double.parseDouble(m.group(1)) * 1000000);
+                BigDecimal big = new BigDecimal(Double.parseDouble(m.group(2)) * 1000000);
                 big = big.add(add);
                 //System.out.println("detected frequency : " + Double.toString(Double.parseDouble(m.group(1))*1000000));
                 System.out.println(Long.toString(big.longValue()));
                 temp[0] = Long.toString(big.longValue());
-                temp[1] = m.group(4);
+                temp[1] = m.group(5);
                 gsmCells.add(temp);
             }
         }
@@ -98,13 +97,18 @@ public class Kalibrate {
         // assert p.getInputStream().read() == -1;
         
         // sort gsm tower by power detected
-        Collections.sort(gsmCells, new Comparator<String[]>() {
-            @Override
-            public int compare(String[] a, String[] b) {
-                return b[1].compareTo(a[1]);
-            }
-        });
+        Collections.sort(gsmCells, (String[] a, String[] b) -> b[1].compareTo(a[1]));
         return gsmCells;
+    }
+    
+    /**
+     * Get the average ppm error with kalibrate-rtl and a specific GSM tower
+     * @param arfcn the arfcn to check
+     * @return the ppm error value from kalibrate-rtl
+     */
+    public static double getPpmErrorRate(String arfcn) {
+        // TODO ; write body (and regex)
+        return 0.0;
     }
 
 }
