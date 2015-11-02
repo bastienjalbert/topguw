@@ -31,6 +31,7 @@ import gsm.tools.Dedicated;
 import gsm.tools.General;
 import gsm.conf.Configuration;
 import gsm.tools.Kalibrate;
+import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
@@ -160,7 +161,8 @@ public class Principal extends JPanel {
     private void initialize() {
 
         frmTopguw = new JFrame();
-        frmTopguw.setResizable(true);
+        frmTopguw.setResizable(false);
+        frmTopguw.setLayout(new BorderLayout());
         frmTopguw.getContentPane().setFont(new Font("Dialog", Font.BOLD, 9));
         frmTopguw.setBackground(SystemColor.desktop);
         frmTopguw.getContentPane().setBackground(SystemColor.control);
@@ -173,14 +175,15 @@ public class Principal extends JPanel {
          * **************** DEFINITION OF THE "CMD" PANNEL (pseudo-shell)
          * *******
          */
-        JTextArea localCmd = new JTextArea();
+        JTextArea localCmd;
+        localCmd = new JTextArea();
         //localCmd.setPreferredSize(new Dimension(700, 255));
         localCmd.setFont(new Font("DejaVu Sans", Font.BOLD, 11));
         localCmd.setEditable(false);
         localCmd.setBounds(57, 145, 700, 255);
         localCmd.setText("Welcome on Topguw, a help to analyze GSM.\n");
         localCmd.append("Topguw is currently in beta version.\n");
-        localCmd.append("Bastien Enjalbert, bastien.enjalbert@gmail.com\n\n");
+        localCmd.append("Bastien Enjalbert\n\n");
         localCmd.setLineWrap(true);
         localCmd.setWrapStyleWord(true);
 
@@ -198,8 +201,10 @@ public class Principal extends JPanel {
 
         /**
          * ************** GSM CHOOSE FOR KALIBRATE ************
+         * Warning : some band are not in the frequency range for some chipset
+         * check http://sdr.osmocom.org/trac/wiki/rtl-sdr#Specifications
          */
-        String[] typeGsm = {"GSM900", "GSM1800"};
+        String[] typeGsm = {"GSM900", "GSM-R", "GSM850", "EGSM", "DCS", "PCS"};
         @SuppressWarnings({"unchecked", "rawtypes"})
         JComboBox mnGsmBand = new JComboBox(typeGsm);
         mnGsmBand.setName("BAND GSM");
@@ -729,7 +734,7 @@ public class Principal extends JPanel {
         scrollBar.setPreferredSize(new Dimension(700, 255));
         scrollBar.setBounds(57, 206, 700, 334);
         scrollBar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        frmTopguw.getContentPane().add(scrollBar);
+        frmTopguw.getContentPane().add(scrollBar, BorderLayout.CENTER);
 
         // We check that all process are exited before quit
         frmTopguw.addWindowListener(new WindowAdapter() {
