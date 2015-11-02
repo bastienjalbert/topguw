@@ -53,16 +53,7 @@ import java.util.regex.Pattern;
  *
  * @author Enjalbert Bastien
  */
-@SuppressWarnings("serial")
 public class General extends Principal {
-
-    public static void main(String[] args) {
-        try {
-            binToCfile(new File("/root/hacking/gsm_dump/test"));
-        } catch (IOException ex) {
-            Logger.getLogger(General.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     /**
      * Base regex for a SDCCH ou SACCH frame example : C1 1218124 1881368:
@@ -121,14 +112,10 @@ public class General extends Principal {
      * @throws java.io.IOException I/O error
      */
     public static void binToCfile(File binfile) throws IOException {
-        // TODO : ne pas emcombrer la mémoire et libérer l'espace au fur 
-              // et a mesure (que 2 bytes occuper à la fois normalement)
 
         int i = 0;
+        // readed byte from the binary file
         int byte1, byte2;
-        int temp1, temp2;
-        byte[] bytes = new byte[4];
-        int bits;
         InputStream buffy = new BufferedInputStream(new FileInputStream(binfile));
         LittleEndianOutputStream dataOut = 
                 new LittleEndianOutputStream(new BufferedOutputStream(new FileOutputStream(binfile.getAbsoluteFile() + ".cfile")));
@@ -137,6 +124,7 @@ public class General extends Principal {
                 dataOut.close();
                 break;
             }
+            // write complex to the cfile (littleEndian) 
             dataOut.writeFloat(((float)byte1 - 127) * 1 / 128);
             dataOut.writeFloat(((float)byte2 - 127) * 1 / 128);
     
@@ -168,6 +156,7 @@ public class General extends Principal {
      * Use rtl_sdr command to sniff a GSM tower
      *
      * @param dir the current working dir
+     * @return the processbuilder linked to the rtl_sdr command 
      */
     public static ProcessBuilder rtlSdrSnif(String dir, String frequency, String gain, String samplerate) {
         ProcessBuilder pb = new ProcessBuilder("rtl_sdr", "-f",
@@ -186,7 +175,7 @@ public class General extends Principal {
      * @return an ArrayList of String
      */
     public static ArrayList<String> readFile(String file) {
-        ArrayList<String> fichier = new ArrayList<String>();
+        ArrayList<String> fichier = new ArrayList<>();
 
         try {
             InputStream ips = new FileInputStream(file);
@@ -213,7 +202,7 @@ public class General extends Principal {
      * @return an ArrayList of String
      */
     public static ArrayList<String> readFile(File file) {
-        ArrayList<String> fichier = new ArrayList<String>();
+        ArrayList<String> fichier = new ArrayList<>();
 
         try {
             InputStream ips = new FileInputStream(file);
@@ -298,7 +287,7 @@ public class General extends Principal {
     }
 
     /**
-     * Detect if a cfile has already been processed
+     * Detect if a cfile has already been processed (by airprobe)
      *
      * @param cfile the cfile file
      * @return true if it has already been processed, false if not
@@ -318,15 +307,15 @@ public class General extends Principal {
     /**
      * Clean an airprobe output (with S parameter)
      *
-     * @param aTraite the "file" to clean (into an ArrayList)
+     * @param toProcess the "file" to clean (into an ArrayList)
      * @return the cleaned ArrayList
      */
-    public static ArrayList<String> cleanAirprobeOutput(ArrayList<String> aTraite) {
+    public static ArrayList<String> cleanAirprobeOutput(ArrayList<String> toProcess) {
 
-        ArrayList<String> aTraiter = aTraite;
+        ArrayList<String> toReturn = toProcess;
 
-        for (int liste = 0; liste < aTraiter.size(); liste++) {
-            String i = aTraiter.get(liste);
+        for (int liste = 0; liste < toReturn.size(); liste++) {
+            String i = toReturn.get(liste);
             // if  :
             if (RGX_FRAME_DEC.matcher(i).matches()) {
                 // If it's a decoded frame: do nothing
@@ -337,12 +326,10 @@ public class General extends Principal {
                 // if it's a malformed frame
                 Matcher recup_err = pat.matcher(i);
                 if (recup_err.find() && !(recup_err.group(1).equals(""))) {
-
-                    //int indice = aTraiter.indexOf(aTraiter.get(liste));
-                    // Taille = taille - taille(msg_err)
-                    aTraiter.set(liste, i.substring(0, i.length()
+                    
+                    toReturn.set(liste, i.substring(0, i.length()
                             - recup_err.group(2).length()));
-                    aTraiter.add(++liste, recup_err.group(2));
+                    toReturn.add(++liste, recup_err.group(2));
 
                 }
             }
@@ -352,10 +339,10 @@ public class General extends Principal {
                 if (recup_err.find()) {
 
                     if (i.length() - recup_err.group(2).length() == 0) { // if the line is just a conv_decode error
-                        aTraiter.remove(liste);
+                        toReturn.remove(liste);
                         liste--; // avoid to jump a line
                     } else { // if the conv_decode error is not an unique line (something before)
-                        aTraiter.set(liste, i.substring(0, i.length()
+                        toReturn.set(liste, i.substring(0, i.length()
                                 - recup_err.group(2).length()));
                     }
                 }
@@ -366,10 +353,10 @@ public class General extends Principal {
                 if (recup_err.find()) {
 
                     if (i.length() - recup_err.group(2).length() == 0) {
-                        aTraiter.remove(liste);
+                        toReturn.remove(liste);
                         liste--; // avoid to jump a line
                     } else {
-                        aTraiter.set(liste, i.substring(0, i.length()
+                        toReturn.set(liste, i.substring(0, i.length()
                                 - recup_err.group(2).length()));
                     }
                 }
@@ -385,8 +372,8 @@ public class General extends Principal {
          *	1110010110111011110000011110001001011101100110000100000101000000111010010000110101111
          *  
          */
-        for (int liste = 0; liste < aTraiter.size(); liste++) {
-            String i = aTraiter.get(liste);
+        for (int liste = 0; liste < toReturn.size(); liste++) {
+            String i = toReturn.get(liste);
             // frame lenght compared to frame number (will not be the same 
             // if the fn is 111 or 12255 for exemple)
             int framelenght;
@@ -397,20 +384,19 @@ public class General extends Principal {
                     || RGX_FRAME_DEC.matcher(i).matches()
                     || RGX_PARITY.matcher(i).matches()
                     || RGX_CANNOT_DEC.matcher(i).matches())) {
-                System.out.println(i + " capté");
-                for (int subList = liste; liste + 20 < aTraiter.size() && subList < liste + 20; subList++) {
+                System.out.println(i + " captured"); //debug
+                for (int subList = liste; liste + 20 < toReturn.size() && subList < liste + 20; subList++) {
 
-                    if (!(RGX_WRN_ERR.matcher(aTraiter.get(subList)).matches()
-                            || RGX_CONVDEC_ERR.matcher(aTraiter.get(subList)).matches()
-                            || RGX_FRAME_DEC.matcher(aTraiter.get(subList)).matches()
-                            || RGX_PARITY.matcher(aTraiter.get(subList)).matches()
-                            || RGX_CANNOT_DEC.matcher(aTraiter.get(subList)).matches())) {
+                    if (!(RGX_WRN_ERR.matcher(toReturn.get(subList)).matches()
+                            || RGX_CONVDEC_ERR.matcher(toReturn.get(subList)).matches()
+                            || RGX_FRAME_DEC.matcher(toReturn.get(subList)).matches()
+                            || RGX_PARITY.matcher(toReturn.get(subList)).matches()
+                            || RGX_CANNOT_DEC.matcher(toReturn.get(subList)).matches())) {
 
-                        if (RGX_FRAME_CCCH.matcher(i + aTraiter.get(subList)).matches()) {
-                            // We concatenate frame correctly
-
-                            aTraiter.set(liste, i + aTraiter.get(subList));
-                            aTraiter.remove(subList);
+                        if (RGX_FRAME_CCCH.matcher(i + toReturn.get(subList)).matches()) {
+                            // We concatenate frames correctly
+                            toReturn.set(liste, i + toReturn.get(subList));
+                            toReturn.remove(subList);
                         }
                     }
                 }
@@ -418,7 +404,7 @@ public class General extends Principal {
         }
 
         // TODO : place parity error (for encrypted frame) just after the frame
-        return aTraiter;
+        return toReturn;
 
     }
 
@@ -429,15 +415,11 @@ public class General extends Principal {
      * @throws Exception Not Immediate Assignment found
      */
     public static void getAirprobeOutput(File file) throws Exception {
-
-        // check if principal output exist
-        //File f = new File(fichier + "_0B"); TODO : intégrer la détection mais demandé à l'utilisateur une confirmation de pas faire les output
-        // TODO : utilisé la méthode alreadyDone (gui?)
-        // pour finir l'itération pour trouvé le channel dédié utilisé par la tour
+        
+        // to stop the script when found the SDCCH channel
         boolean finish = false;
 
-        //if(!(f.exists() && !f.isDirectory())) {  
-        // Extract 
+        // Extract data with airprobe
         ProcessBuilder pb = new ProcessBuilder("sh", "go.sh", file.getAbsolutePath(), Configuration.DEC_RATE, Configuration.BTSCONF);
         pb.directory(new File(Configuration.gsmReceivePath + "/src/python/"));
         pb.redirectOutput(new File(file.getAbsolutePath() + "_" + Configuration.BTSCONF));
@@ -449,9 +431,9 @@ public class General extends Principal {
         p.waitFor();
         p.destroy();
         p.destroyForcibly();
-        //	}
-        // We get broadcast channel
-        broadcastChannelTab = Broadcast.lignesToTab(readFile(file.getAbsolutePath() + "_" + Configuration.BTSCONF));
+        
+        // Get broadcast channel
+        broadcastChannelTab = Broadcast.linesToArray(readFile(file.getAbsolutePath() + "_" + Configuration.BTSCONF));
 
         // Potential Immediate Assignment index
         ArrayList<Integer> imAs = Broadcast.extractImAs(broadcastChannelTab);
@@ -482,9 +464,7 @@ public class General extends Principal {
                 finish = true;
             }
         }
-        dedicatedChannelTab = Dedicated.lignesToTab(readFile(file.getAbsolutePath() + "_" + timeslot + "S"));
-        // debug line TODO : delete
-        System.out.println("fichier " + file.getAbsolutePath() + "_" + timeslot + "S" + " traité");
+        dedicatedChannelTab = Dedicated.linesToArray(readFile(file.getAbsolutePath() + "_" + timeslot + "S"));
     }
 
     /**
@@ -504,7 +484,7 @@ public class General extends Principal {
         StringBuilder oneXoredBurst;
         
         // number of bursts that cannot be xored
-        int imposs = 0;
+        int cant = 0;
 
         for (int j = 0; j < 4; j++) {
             if (isABurst(beginBursts[j]) && isABurst(endBursts[j])) {
@@ -515,12 +495,12 @@ public class General extends Principal {
                 xoredBursts[j] = oneXoredBurst.toString();
                 
             } else {
-                imposs++;
+                cant++;
                 xoredBursts[j] = "Incorrect bursts from capture, can't xor them.";
             }
         }
-        
-        if(imposs >= 3) 
+        // return an empty array if there is only one bursts xored (because find_kc needs 2 xored bursts)
+        if(cant >= 3)  
             return new String[0];
         
         // add a5/1 frame number from encrypted frame to simplify crack steps
@@ -592,11 +572,7 @@ public class General extends Principal {
      * @return true if the String seems to be a bursts, false otherwise
      */
     public static boolean isABurst(String toTest) {
-        if (toTest.length() == 114 && toTest.matches("[01]*")) {
-            return true;
-        } else {
-            return false;
-        }
+        return toTest.length() == 114 && toTest.matches("[01]*");
     }
 
     /**
@@ -655,12 +631,10 @@ public class General extends Principal {
     public static boolean isInteger(String s) {
         try {
             Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            return false;
-        } catch (NullPointerException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             return false;
         }
-        // only got here if we didn't return false
+        // only got here if the string is parsable into an Integer
         return true;
     }
 
