@@ -480,7 +480,7 @@ public class Principal extends JPanel {
 
                     setFile(cfile_file.getSelectedFile());
                     
-                    if (JOptionPane.showConfirmDialog(null, "Is the file is a cfile ?", "Cfile or Binary file",
+                    if (JOptionPane.showConfirmDialog(null, "Is the file is a cfile (no for bin file)?", "Cfile or Binary file",
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
                         == JOptionPane.YES_OPTION) {
                     } else {
