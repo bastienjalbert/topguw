@@ -26,14 +26,18 @@
  */
 package gsm.conf;
 
-import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.Properties;
 
 /**
  * General configuration for the application
  * @author bastien enjalbert
  */
 public class Configuration {
-    
+    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
     /**
      * Decimation rate for airprobe 
      * For example a rtl-sdr device works with 64
@@ -46,9 +50,37 @@ public class Configuration {
     public static String BTSCONF = "0B";
     
     // gsm-receive Path from Airprobe
-    public static File gsmReceivePath = new File("/root/airprobe/gsm-receiver/");
+    public static String gsmReceivePath = "/root/airprobe/gsm-receiver/";
     // gsmframecoder Path (test folder) 
-    public static File gsmFrameCoder = new File("/root/gsmframecoder/gsmframecoder/test/");
+    public static String gsmFrameCoder = "/root/gsmframecoder/gsmframecoder/test/";
 
-    
+
+    public static void saveProperties() {
+        Properties prop = new Properties();
+        prop.put("dec_rate",Configuration.DEC_RATE);
+        prop.put("btsconf",Configuration.BTSCONF);
+        prop.put("gsmReceivePath",Configuration.gsmReceivePath);
+        prop.put("gsmFrameCoder",Configuration.gsmFrameCoder);
+        try {
+            prop.store(new FileOutputStream("config.properties"),"");
+        } catch (FileNotFoundException e) {
+            logger.error(e.getMessage(), e);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public static void loadProperties() {
+        Properties prop = new Properties();
+        try {
+            prop.load(new FileInputStream("config.properties"));
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        Configuration.DEC_RATE = prop.getProperty("dec_rate","64");
+        Configuration.BTSCONF = prop.getProperty("btsconf","0B");
+        Configuration.gsmReceivePath = prop.getProperty("gsmReceivePath", "/root/airprobe/gsm-receiver/");
+        Configuration.gsmFrameCoder = prop.getProperty("gsmFrameCoder", "/root/gsmframecoder/gsmframecoder/test/");
+
+    }
 }

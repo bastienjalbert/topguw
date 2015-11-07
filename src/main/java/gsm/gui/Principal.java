@@ -31,6 +31,10 @@ import gsm.tools.Dedicated;
 import gsm.tools.General;
 import gsm.conf.Configuration;
 import gsm.tools.Kalibrate;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
@@ -64,12 +68,11 @@ import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings("serial")
 public class Principal extends JPanel {
-
+    private static final Logger logger = LoggerFactory.getLogger(Principal.class);
+    private static final String NEW_LINE = "\n";
     // Line starting for the pseudo-shell
     protected static String START_LINE = "Topguw> ";
 
@@ -159,7 +162,7 @@ public class Principal extends JPanel {
      * Initialize the contents of the frame.
      */
     private void initialize() {
-
+        Configuration.loadProperties();
         frmTopguw = new JFrame();
         frmTopguw.setResizable(false);
         frmTopguw.setLayout(new BorderLayout());
@@ -175,15 +178,13 @@ public class Principal extends JPanel {
          * **************** DEFINITION OF THE "CMD" PANNEL (pseudo-shell)
          * *******
          */
-        JTextArea localCmd;
         localCmd = new JTextArea();
         //localCmd.setPreferredSize(new Dimension(700, 255));
         localCmd.setFont(new Font("DejaVu Sans", Font.BOLD, 11));
         localCmd.setEditable(false);
         localCmd.setBounds(57, 145, 700, 255);
         localCmd.setText("Welcome on Topguw, a help to analyze GSM.\n");
-        localCmd.append("Topguw is currently in beta version.\n");
-        localCmd.append("Bastien Enjalbert\n\n");
+        localCmd.append("Topguw is currently in beta version.\nBastien Enjalbert\n\n");
         localCmd.setLineWrap(true);
         localCmd.setWrapStyleWord(true);
 
@@ -252,19 +253,19 @@ public class Principal extends JPanel {
         btnExtractEncryptedSi.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                localCmd.append(START_LINE + "Start finding SI (encrypted/ciphered version), please wait...\n");
+                addLine("Start finding SI (encrypted/ciphered version), please wait...");
                 localCmd.update(localCmd.getGraphics());
 
                 encryptedSiPosition = new ArrayList<String[]>();
                 try {
                     encryptedSiPosition = Dedicated.getEncryptedSi();
                 } catch (Exception e1) {
-                    localCmd.append(START_LINE + "Error : " + e1);
-                    localCmd.update(localCmd.getGraphics());
+                    addLine("Error : " + e1);
+
                 }
 
-                localCmd.append(START_LINE + encryptedSiPosition.size() + " possible ciphered SI position found.\n");
-                localCmd.update(localCmd.getGraphics());
+                addLine(encryptedSiPosition.size() + " possible ciphered SI position found.");
+
                 General.writeFileWithArray(encryptedSiPosition, file.getAbsolutePath() + "_ENCRYPTED_SI_POS", 1);
 
             }
@@ -278,8 +279,8 @@ public class Principal extends JPanel {
         btnGetCleanBursts.setBounds(57, 150, 192, 25);
         btnGetCleanBursts.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                localCmd.append(START_LINE + "Start extracting SI bursts without Time Advance, please wait...\n");
-                localCmd.update(localCmd.getGraphics());
+                addLine("Start extracting SI bursts without Time Advance, please wait...");
+
 
                 //ArrayList<String[]> siBursts = new ArrayList<String[]>();
                 //TODO : CHECK THAT systemInfo have been initialized
@@ -303,8 +304,8 @@ public class Principal extends JPanel {
                 } catch (Exception e1) {
                 }
 
-                localCmd.append(START_LINE + "SI bursts without Time Advance have been extracted.\n");
-                localCmd.update(localCmd.getGraphics());
+                addLine("SI bursts without Time Advance have been extracted.");
+
 
             }
         });
@@ -317,25 +318,25 @@ public class Principal extends JPanel {
         btnExtractCiphMod.setBounds(292, 109, 271, 25);
         btnExtractCiphMod.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                localCmd.append(START_LINE + "Start getting Ciphering Mode Command, please wait...\n");
-                localCmd.update(localCmd.getGraphics());
+                addLine("Start getting Ciphering Mode Command, please wait...");
+
                 ArrayList<String[]> cipherModPosition = Dedicated.getCipherModCmd(dedicatedChannelTab);
                 if (cipherModPosition.isEmpty()) {
-                    localCmd.append(START_LINE + "Sorry but no Ciphering Mode Command have been discovered.\n");
-                    localCmd.append(START_LINE + "Maybe you should sniff longer the GSM tower.\n");
-                    localCmd.update(localCmd.getGraphics());
+                    addLine("Sorry but no Ciphering Mode Command have been discovered.");
+                    addLine("Maybe you should sniff longer the GSM tower.");
+
                 } else {
                     for (int i = 0; i < cipherModPosition.size(); i++) {
-                        localCmd.append(START_LINE + "fn : " + cipherModPosition.get(i)[0] + " frame (hex) : "
-                                + cipherModPosition.get(i)[1] + "\n");
-                        localCmd.update(localCmd.getGraphics());
+                        addLine("fn : " + cipherModPosition.get(i)[0] + " frame (hex) : "
+                                + cipherModPosition.get(i)[1] + "");
+
                     }
                 }
                 // save cipher mod command position
                 General.writeFileWithArray(cipherModPosition, file.getAbsolutePath() + "_CIPHER_MOD_CMD", 1);
 
-                localCmd.append("debug : " + "Getting Ciphering Mode Command is done.\n");
-                localCmd.update(localCmd.getGraphics());
+                localCmd.append("debug : " + "Getting Ciphering Mode Command is done.");
+
             }
         });
         btnExtractCiphMod.setEnabled(false);
@@ -348,8 +349,8 @@ public class Principal extends JPanel {
         btnGetPossibleKeystream.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                localCmd.append(START_LINE + "Start getting possible keystreams, please wait...\n");
-                localCmd.update(localCmd.getGraphics());
+                addLine("Start getting possible keystreams, please wait...");
+
 
                 // TODO : check if encryptedSiPosition is initialized (ou dans la méthode ?)
                 ArrayList<String[]> possibleKeystream = new ArrayList<>();
@@ -390,8 +391,8 @@ public class Principal extends JPanel {
                                 }
                                 possibleKeystream.add(temp);
                             } catch (NumberFormatException e2) {
-                                localCmd.append(START_LINE + "Sorry, an error happened while trying to extract keystream. \n");
-                                localCmd.update(localCmd.getGraphics());
+                                addLine("Sorry, an error happened while trying to extract keystream. ");
+
                             }
                             /**
                              * ******** WITHOUT OTHER INFORMATIONS
@@ -408,8 +409,8 @@ public class Principal extends JPanel {
                     }
                 }
 
-                localCmd.append(START_LINE + "Getting possible keystreams is done.\n");
-                localCmd.update(localCmd.getGraphics());
+                addLine("Getting possible keystreams is done.");
+
                 General.writeFileWithArray(possibleKeystream, file.getAbsolutePath() + "_POSSIBLE_KEYSTREAMs", 2);
             }
         });
@@ -422,25 +423,25 @@ public class Principal extends JPanel {
         btnExtractSiPlaintext.setBounds(57, 109, 223, 25);
         btnExtractSiPlaintext.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                localCmd.append(START_LINE + "Start getting SI plaintext, please wait...\n");
-                localCmd.update(localCmd.getGraphics());
+                addLine("Start getting SI plaintext, please wait...");
+
                 ArrayList<String[]> tempSiPosition = Dedicated.getSysInfo(dedicatedChannelTab);
                 if (tempSiPosition.isEmpty()) {
-                    localCmd.append(START_LINE + "Sorry but no SI plaintext have been discovered.\n");
-                    localCmd.append(START_LINE + "Maybe you should sniff longer the GSM tower.\n");
-                    localCmd.update(localCmd.getGraphics());
+                    addLine("Sorry but no SI plaintext have been discovered.");
+                    addLine("Maybe you should sniff longer the GSM tower.");
+
                 } else {
                     for (int i = 0; i < tempSiPosition.size(); i++) {
-                        localCmd.append(START_LINE + tempSiPosition.get(i)[2] + " found, fn : " + tempSiPosition.get(i)[0] + " frame (hex) : "
-                                + tempSiPosition.get(i)[1] + "\n");
-                        localCmd.update(localCmd.getGraphics());
+                        addLine(tempSiPosition.get(i)[2] + " found, fn : " + tempSiPosition.get(i)[0] + " frame (hex) : "
+                                + tempSiPosition.get(i)[1] + "");
+
                     }
                 }
                 // save plaintext SI found
                 General.writeFileWithArray(tempSiPosition, file.getAbsolutePath() + "_PLAINTEXT_SI", 1);
 
-                localCmd.append("debug : " + "Getting SI plaintext is done.\n");
-                localCmd.update(localCmd.getGraphics());
+                localCmd.append("debug : " + "Getting SI plaintext is done.");
+
             }
         });
         btnExtractSiPlaintext.setEnabled(false);
@@ -461,7 +462,7 @@ public class Principal extends JPanel {
          for(int i = 0 ; i < tempSiPosition.size() ; i++) {
          localCmd.append(DEB_LIGNE + "fn : " + tempSiPosition.get(i)[0] + " frame (hex) : " 
          + tempSiPosition.get(i)[1]);
-         localCmd.update(localCmd.getGraphics());
+
 										
          }
          }
@@ -484,20 +485,20 @@ public class Principal extends JPanel {
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
                         == JOptionPane.YES_OPTION) {
                     } else {
-                        localCmd.append(START_LINE + "Converting the binary file into a cfile, please wait...\n");
-                        localCmd.update(localCmd.getGraphics());
+                        addLine("Converting the binary file into a cfile, please wait...");
+
                         try {
                             General.binToCfile(file);
                         } catch (IOException ex) {
-                            localCmd.append(START_LINE + "Sorry, an error happened while trying to converting the file.\n");
-                            localCmd.update(localCmd.getGraphics());
+                            addLine("Sorry, an error happened while trying to converting the file.");
+
                         }
                         
                     }
                     
                     try {
-                        localCmd.append(START_LINE + "Getting channel outputs for the cfile, please wait...\n");
-                        localCmd.update(localCmd.getGraphics());
+                        addLine("Getting channel outputs for the cfile, please wait...");
+
                         if (General.alreadyDone(file)) {
                             int dialogResult = JOptionPane.showConfirmDialog(null,
                                     "This file seem to have been already loaded before, would you want to "
@@ -514,17 +515,17 @@ public class Principal extends JPanel {
                             General.getAirprobeOutput(file);
                         }
                     } catch (Exception e1) {
-                        localCmd.append(START_LINE + "An error occur when trying to clean the output for dedicated chanel : \n");
-                        localCmd.append(START_LINE + e1.getMessage());
-                        localCmd.update(localCmd.getGraphics());
+                        addLine("An error occur when trying to clean the output for dedicated chanel : ");
+                        addLine(e1.getMessage());
+
                     }
 
                     // Clean the output file if user wants
                     if (JOptionPane.showConfirmDialog(null, "Do you want to try to correct go.sh output for dedicated Chanel?\nIt will help to analyze GSM datas.", "Correct datas?",
                             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
                             == JOptionPane.YES_OPTION) {
-                        localCmd.append(START_LINE + "Making dirty cleaner, please wait...\n");
-                        localCmd.update(localCmd.getGraphics());
+                        addLine("Making dirty cleaner, please wait...");
+
                         ArrayList<String> dedicatedTemp = General.cleanAirprobeOutput(General.readFile(file.getAbsolutePath() + "_" + timeslot + "S"));
                         dedicatedChannelTab = Dedicated.linesToArray(dedicatedTemp);
                         General.writeFile(dedicatedTemp, file.getAbsolutePath() + "_" + timeslot + "S_Topguw-corrected");
@@ -540,8 +541,8 @@ public class Principal extends JPanel {
                     btnGetCleanBursts.setEnabled(true);
                     btnGetPossibleKeystream.setEnabled(true);
 
-                    localCmd.append(START_LINE + "Files correctly loaded.\n");
-                    localCmd.update(localCmd.getGraphics());
+                    addLine("Files correctly loaded.");
+
 
                     lblLoadedFile.setVisible(true);
 
@@ -557,20 +558,19 @@ public class Principal extends JPanel {
         btnGo.setBackground(new Color(189, 189, 189));
         btnGo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
                 try {
                     if (frequency.equals("")) {
 
-                        localCmd.append(START_LINE + "Scanning for " + mnGsmBand.getSelectedItem().toString() + " towers with "
-                                + String.valueOf(sliderGainKal.getValue()) + " of gain, please wait.\n");
-                        localCmd.update(localCmd.getGraphics());
+                        addLine("Scanning for " + mnGsmBand.getSelectedItem().toString() + " towers with "
+                                + String.valueOf(sliderGainKal.getValue()) + " of gain, please wait.");
+
                         ArrayList<String[]> cells = new ArrayList<>();
                         try {
                             cells = Kalibrate.getGsmCell(mnGsmBand.getSelectedItem().toString(), String.valueOf(sliderGainKal.getValue()));
                         } catch (Exception e1) {
-                            localCmd.append(START_LINE + "An error occur while scanning : \n");
-                            localCmd.append(START_LINE + e1.getMessage() + "\n");
-                            localCmd.update(localCmd.getGraphics());
+                            addLine("An error occur while scanning : ");
+                            addLine(e1.getMessage() + "");
+
                         }
 
                         if (!(cells.isEmpty())) {
@@ -586,8 +586,8 @@ public class Principal extends JPanel {
                                 freq = new BigDecimal(cells.get(i)[0]);
                                 frequencies[i] = df.format(freq) + " " + cells.get(i)[1];
 
-                                localCmd.append(START_LINE + "Cell [freq : " + cells.get(i)[0] + "Hz, power : " + cells.get(i)[1] + "]\n");
-                                localCmd.update(localCmd.getGraphics());
+                                addLine("Cell [freq : " + cells.get(i)[0] + "Hz, power : " + cells.get(i)[1] + "]");
+
                             }
                             String s = (String) JOptionPane.showInputDialog(
                                     frmTopguw,
@@ -595,10 +595,14 @@ public class Principal extends JPanel {
                                     "Customized Dialog",
                                     JOptionPane.PLAIN_MESSAGE, null, frequencies,
                                     "GSM Tower choice");
+                            if (StringUtils.isEmpty(s)){
+                                //The user clicked Cancel
+                                return;
+                            }
                             frequency = s.split(" ")[0];
                         } else {
-                            localCmd.append(START_LINE + "No gsm tower found, disconnet and reconnect RTL-SDR and try again.\n");
-                            localCmd.append(START_LINE + "Maybe kalibrate-rtl is not working correctly too.\n");
+                            addLine("No gsm tower found, disconnet and reconnect RTL-SDR and try again.");
+                            addLine("Maybe kalibrate-rtl is not working correctly too.");
                         }
 
                         // Start sniffing
@@ -617,16 +621,16 @@ public class Principal extends JPanel {
                             options[0]);
                     p.destroy();
                     p.destroyForcibly();
-                    localCmd.append(START_LINE + "Start converting the binary file into a cfile.\n");
-                    localCmd.update(localCmd.getGraphics());
+                    addLine("Start converting the binary file into a cfile.");
+
                     General.binToCfile(new File(frequency + "_AIRPROBE_OUTPUT_BIN"));
-                    localCmd.append(START_LINE + "Bin file converted.\n");
+                    addLine("Bin file converted.");
 
                 } catch (IOException ex) {
-                    Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+                   logger.error(ex.getMessage(), ex);
                 }
 
-                localCmd.update(localCmd.getGraphics());
+
 
             }
 
@@ -661,11 +665,11 @@ public class Principal extends JPanel {
                         sliderGainKal.setVisible(true);
                         mnGsmBand.setVisible(true);
                         btnGo.setVisible(true);
-                        localCmd.append(START_LINE + "Frequency " + fr + " is correctly setup.\n");
+                        addLine("Frequency " + fr + " is correctly setup.");
                     } else {
-                        localCmd.append(START_LINE + "Specified frequency seems not to be valid.\n");
+                        addLine("Specified frequency seems not to be valid.");
                     }
-                    localCmd.update(localCmd.getGraphics());
+
                 }
 
             }
@@ -700,11 +704,12 @@ public class Principal extends JPanel {
                 int result = JOptionPane.showConfirmDialog(null, config, "Configuration",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                 if (result == JOptionPane.OK_OPTION) {
-                    Configuration.gsmReceivePath = new File(gsmReceivePathChamp.getText());
-                    Configuration.gsmFrameCoder = new File(gsmFrameCoderPathChamp.getText());
+                    Configuration.gsmReceivePath = gsmReceivePathChamp.getText();
+                    Configuration.gsmFrameCoder = gsmFrameCoderPathChamp.getText();
                     Configuration.DEC_RATE = gsmDecimalRate.getText();
                     Configuration.BTSCONF = gsmBroadcastType.getText();
-                    localCmd.append(START_LINE + "Configuration has successfuly changed.\n");
+                    Configuration.saveProperties();
+                    addLine("Configuration has successfuly changed.");
                 } else {
                 }
             }
@@ -745,6 +750,14 @@ public class Principal extends JPanel {
                 // reassess this
             }
         });
+
+    }
+
+    protected void addLine(String message) {
+        localCmd.append(START_LINE);
+        localCmd.append(message);
+        localCmd.append(NEW_LINE);
+        localCmd.update(localCmd.getGraphics());
 
     }
 

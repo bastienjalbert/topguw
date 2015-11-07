@@ -30,6 +30,7 @@ import gsm.conf.Configuration;
 import gsm.gui.Principal;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -372,7 +373,7 @@ public class Dedicated extends Principal {
         hexaFrameNoTA.setCharAt(3, '0');
         ProcessBuilder pb = new ProcessBuilder("./gsmframecoder", hexaFrameNoTA.toString());
         pb.redirectErrorStream(true);
-        pb.directory(Configuration.gsmFrameCoder);
+        pb.directory(new File(Configuration.gsmFrameCoder));
         Process p = pb.start();
 
         p.getOutputStream().flush();
