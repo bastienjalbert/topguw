@@ -1,3 +1,7 @@
+# News
+
+I'm working on an API that work with GR-GSM (not airprobe anymore), Topguw v1 is really dirty, this API will make gsm analysis easily done in Java and make application creation for anybody possible on the gsm protocol. If you want to help me : contact me, you can find sources here https://github.com/bastienjalbert/topguw_api/ .
+
 # Topguw
 
 I had to change the repository because of some local problem.. I'm sorry for those who forked and/or star my project. This will be the last for Topguw.
