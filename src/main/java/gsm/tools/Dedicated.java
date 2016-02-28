@@ -225,7 +225,7 @@ public class Dedicated extends Principal {
                             && Integer.parseInt(dedicatedChannelTab.get(j)[1]) != Integer.parseInt(systemInfo.get(i)[0])
                             // if frames(unencrypted and possible encrypted) are in the same place in the multi frame
                             // HERE IT'S ONE OF THE MOST IMPORTANT CHECK TO FOUND POSSIBLE ENCRYPTED SI (and so KEYSTREAMs)
-                            && ((Integer.parseInt(dedicatedChannelTab.get(j)[1]) - Integer.parseInt(systemInfo.get(i)[0])) % 204  == 0)) {
+                            && ((Integer.parseInt(dedicatedChannelTab.get(j)[1]) - Integer.parseInt(systemInfo.get(i)[0])) % 101 == 0)) {
                         
                         for (int a = 0; a < cipherModCommand.size(); a++) {
                             // the frame is after a ciphering mod command
@@ -244,9 +244,9 @@ public class Dedicated extends Principal {
 
                                 localDedicatedChannelFn = Integer.parseInt(dedicatedChannelTab.get(j)[1]);
                                 temp[0] = systemInfo.get(i)[0];
-                                temp[1] = "fn[" + Integer.toString(Integer.parseInt(systemInfo.get(i)[0]) % 102) + "]";
+                                temp[1] = "fn[" + Integer.toString(Integer.parseInt(systemInfo.get(i)[0]) % 101) + "]";
                                 temp[2] = dedicatedChannelTab.get(j)[1];
-                                temp[3] = "fn[" + Integer.toString(Integer.parseInt(dedicatedChannelTab.get(j)[1]) % 102) + "]";
+                                temp[3] = "fn[" + Integer.toString(Integer.parseInt(dedicatedChannelTab.get(j)[1]) % 101) + "]";
                                 cipheredSi.add(temp);
                             }
                         }
@@ -411,18 +411,18 @@ public class Dedicated extends Principal {
             String[] temp = new String[2];
             // Si fn % 102 == 32,47 -> on ajoute 
             if (enTableau.get(i).length > 2 && General.isInteger(enTableau.get(i)[1])
-                    && (Integer.parseInt(enTableau.get(i)[1]) % 102 >= 32
-                    && Integer.parseInt(enTableau.get(i)[1]) % 102 <= 47)
+                    && (Integer.parseInt(enTableau.get(i)[1]) % 101 >= 32
+                    && Integer.parseInt(enTableau.get(i)[1]) % 101<= 47)
                     && !(tempFn.equals(enTableau.get(i)[1]))) {
                 tempFn = enTableau.get(i)[1];
                 temp[0] = enTableau.get(i)[1];
-                if (Integer.parseInt(enTableau.get(i)[1]) % 102 == 35
-                        || Integer.parseInt(enTableau.get(i)[1]) % 102 == 39
-                        || Integer.parseInt(enTableau.get(i)[1]) % 102 == 43
-                        || Integer.parseInt(enTableau.get(i)[1]) % 102 == 47) {
-                    temp[1] = String.valueOf(Integer.parseInt(enTableau.get(i)[1]) % 102) + "\nFound end of frame";
+                if (Integer.parseInt(enTableau.get(i)[1]) % 101 == 35
+                        || Integer.parseInt(enTableau.get(i)[1]) % 101 == 39
+                        || Integer.parseInt(enTableau.get(i)[1]) % 101 == 43
+                        || Integer.parseInt(enTableau.get(i)[1]) % 101 == 47) {
+                    temp[1] = String.valueOf(Integer.parseInt(enTableau.get(i)[1]) % 101) + "\nFound end of frame";
                 } else {
-                    temp[1] = String.valueOf(Integer.parseInt(enTableau.get(i)[1]) % 102);
+                    temp[1] = String.valueOf(Integer.parseInt(enTableau.get(i)[1]) % 101);
                 }
 
                 lesSi.add(temp);
