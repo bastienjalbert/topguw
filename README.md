@@ -1,23 +1,23 @@
 # News
 
-I'm working on an API that work with GR-GSM (not airprobe anymore), Topguw v1 is really dirty, this API will make gsm analysis easily done in Java and make application creation for anybody possible on the gsm protocol. If you want to help me : contact me, you can find sources here https://github.com/bastienjalbert/topguw_api/ .
+I'm working on an API that works with GR-GSM (not airprobe anymore), Topguw v1 is really dirty, this API will easily perform gsm analysis in Java and make application creation possible for anybody on the gsm protocol. If you want to help me : contact me, you can find sources here https://github.com/bastienjalbert/topguw_api/ .
 
 # Topguw
 
-I had to change the repository because of some local problem.. I'm sorry for those who forked and/or star my project. This will be the last for Topguw.
+I had to change the repository because of some local problems.. I'm sorry to those who forked and/or stared my project. This will be the last for Topguw.
 Sorry again for the inconvenience.
 
 ### About
-Topguw is a little software that I made to help people who want to analyse and then crack GSM. 
+Topguw is a small piece of software that I made to help people who want to analyse and then crack GSM. 
 Topguw works with airprobe and kalibrate-rtl. 
-It makes some steps of the know-plaintext attack vector to GSM automatically (Karsten Nohl).
+It takes some steps of the know-plaintext attack vector to GSM automatically (Karsten Nohl).
 
-The actual version is currently in beta, bugs may occur but the software will works with good input datas.
+The actual version is currently in beta, bugs may occur but the software will work with good input data.
 V0.1
 
 ## How to install
 1. Dependencies 
-  -  Firstly you have to install airprobe and gsmframecoder (airprobe depends on gnu-radio **3.6**, so if you use Kali 2 for example you have 2 solution -> downgrade to kali 1 or use the zmiana patch).
+  -  First, you have to install airprobe and gsmframecoder, (airprobe depends on gnu-radio **3.6**, so if you use Kali 2 for example you have 2 solutions -> downgrade to kali 1 or use the zmiana patch).
   -  You should install kalibrate-rtl too (Topguw uses kal command to scan GSM tower).
   -  Not really a dependencies, just to tell you that I use Oracle JDK 8 to run Topguw.
 
