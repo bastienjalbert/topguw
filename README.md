@@ -1,5 +1,7 @@
 # News
 
+## Topguw v2 development is being started, code and more informations available here : https://github.com/bastienjalbert/topguw2
+
 I'm working on an API that works with GR-GSM (not airprobe anymore), Topguw v1 is really dirty, this API will easily perform gsm analysis in Java and make application creation possible for anybody on the gsm protocol. If you want to help me : contact me, you can find sources here https://github.com/bastienjalbert/topguw_api/ .
 
 # Topguw
