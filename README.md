@@ -29,7 +29,7 @@ V0.1
 
 ## How to use
 
-Watch [the demo](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&cad=rja&uact=8&ved=2ahUKEwjvpIL5kMvkAhUBixoKHYDtA34QtwIwAnoECAkQAQ&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D--VIisKqVYk&usg=AOvVaw0YRlSNFXK8focbisF1a7F6) on youtube.
+Watch [the demo](https://www.youtube.com/watch?v=--VIisKqVYk) on youtube.
 
 ## Disclaimer
 
